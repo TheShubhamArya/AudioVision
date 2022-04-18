@@ -32,7 +32,7 @@ class LanguageProcessor {
         tagger.enumerateTags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .nameType, options: options) { tag, tokenRange in
             if let tag = tag, tags.contains(tag) {
                 wordsToIgnoreSet.insert(String(text[tokenRange]))
-                print("\(text[tokenRange]): \(tag.rawValue)")
+//                print("\(text[tokenRange]): \(tag.rawValue)")
             }
             
             return true
@@ -59,7 +59,7 @@ class LanguageProcessor {
     }
     
     private func correctMisspelledWords(for text: String,ignoring wordsToIgnore: Set<String>) ->String {
-        print(text)
+//        print(text)
         let textChecker = UITextChecker()
         let nsString = NSString(string: text)
         let stringRange = NSRange(location: 0, length: nsString.length)
@@ -89,7 +89,7 @@ class LanguageProcessor {
             }
            
         } while true
-        print(correctedText)
+//        print(correctedText)
         return correctedText
     }
     

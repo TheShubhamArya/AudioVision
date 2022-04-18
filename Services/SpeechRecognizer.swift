@@ -24,6 +24,7 @@ class SpeechRecognizer {
 //                                           "": .readFromFiles,"": .takePicture, "": .done, "": .readToMe, "": .readPrevious, "": .readNext]
 
     func recognizeSpeech() {
+        print("recognize speech function")
         request = SFSpeechAudioBufferRecognitionRequest()
         node = audioEngine.inputNode
         let recordingFormat = node?.outputFormat(forBus: 0)
@@ -109,6 +110,7 @@ class SpeechRecognizer {
     }
     
     func stopRecognizingSpeech() {
+        print("stop  recognizing speech function")
         audioEngine.stop()
         node?.removeTap(onBus: 0)
         self.recognitionTask = nil

@@ -47,6 +47,8 @@ struct K {
                                        UTType("com.microsoft.excel.xls")!,
                                        UTType("org.openxmlformats.spreadsheetml.sheet")!
     ]
+    
+    static let emptyCollectionViewText = "1. Say the commands for the actions you want to perform.\n\n2. Capture or choose an image with text.\n\n3. Vision extracts the text from the image.\n\n4. Text is processed by natural language processing to correct errors.\n\n5. Corrected text is read aloud using a speech synthesizer."
                          
 }
 

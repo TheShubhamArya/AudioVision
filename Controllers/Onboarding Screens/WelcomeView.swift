@@ -31,6 +31,7 @@ struct WelcomeView: View {
                         
                         VStack {
                             FeatureCell(color: .blue, image: "mic.fill", headline: "Speech Recognizer", subtitle: "Use voice commands to get around the app without using hands or seeing the screen. This is done so a visually impaired person can easily use the app.")
+                            FeatureCell(color: .blue, image: "scissors", headline: "Image Stitching", subtitle: "Capture multiple images and stitch them together to create  one long image.")
                             FeatureCell(color: .blue, image: "eye.fill", headline: "Computer Vision", subtitle: "The image selected by you can be used to detect text within the image.")
                             FeatureCell(color: .blue, image: "textformat.abc", headline: "Natural Language Processing", subtitle: "The text in the image is checked for any spelling errors. A sentimental score for the text is also returned so user's know the emotions for the text.")
                             FeatureCell(color: .blue, image: "speaker.wave.2.fill", headline: "Speech Synthesizer", subtitle: "The corrected text is then read aloud to the user through the speakers in the device. ")
@@ -50,17 +51,17 @@ struct WelcomeView: View {
                 NavigationLink(destination: TutorialView()) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10.0)
-                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 75)
+                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 65)
                             .foregroundColor(Color.blue)
                             .shadow(radius: 5)
                         Text("Learn speech commands")
                             .font(.system(size: 20, weight: .semibold, design: .default))
                             .foregroundColor(.white)
                     }
-                }.padding(.horizontal)
+                }.padding()
             }
             .navigationTitle("AudioVision")
-        }
+        }.navigationViewStyle(.stack)
     }
     
     struct FeatureCell: View {

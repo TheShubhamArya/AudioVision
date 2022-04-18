@@ -50,6 +50,7 @@ class HomeVC : UIViewController {
         let vc = WelcomeView()
         let host = UIHostingController(rootView: vc)
         present(host, animated: true, completion: nil)
+        UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
     }
     
     func setupNavbar() {
@@ -190,7 +191,7 @@ extension HomeVC : UICollectionViewDelegateFlowLayout, UICollectionViewDataSourc
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if speechService.speechTexts.isEmpty {
-            collectionView.setEmptyView(title: "Capture text in image and listen", message: "")
+            collectionView.setEmptyView(title: "How it works?", message: K.emptyCollectionViewText)
             return 0
         }
         collectionView.restore()

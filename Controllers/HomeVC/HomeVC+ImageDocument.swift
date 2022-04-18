@@ -19,6 +19,7 @@ extension HomeVC : CapturedImageProtocol {
     }
     
     func didReturnCapturedImages(with images: [UIImage]) {
+        print("Images returned to home ",images.count)
         collectionView.restore()
         for image in images {
             let fixedImage = image.fixOrientation

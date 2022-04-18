@@ -30,9 +30,16 @@ class CaptureImageVC: UIViewController {
     
     var takePicture = false
     var backCameraOn = true
+    var  isDone = 0
     
     var capturedImages = [UIImage]()
 
+    let activityIndicator : UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = .gray
+        return activityIndicator
+    }()
     
     let captureImageButton : UIButton = {
         let button = UIButton()
@@ -59,6 +66,15 @@ class CaptureImageVC: UIViewController {
         setupView()
         speechRecognizer.speechRecognizerDelegate = self
         speechRecognizer.speechRecognitionAuthorization()
+        view.addSubview(activityIndicator)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        navigationItem.setHidesBackButton(true, animated: true)
+        navigationItem.hidesBackButton = true
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneAction))
     }
     
 //    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -74,25 +90,31 @@ class CaptureImageVC: UIViewController {
 //    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
 //        return UIInterfaceOrientation.portrait
 //    }
-//    
+//
 //    override func viewWillLayoutSubviews() {
 //        super.viewWillLayoutSubviews()
 //        print("view will layout subviews")
 //        setupView()
 //    }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         checkPermissions()
         setupAndStartCaptureSession()
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneAction))
     }
     
     @objc func doneAction() {
-        print("done button tapped")
-        speechRecognizer.stopRecognizingSpeech()
-        captureImageDelegate.didReturnCapturedImages(with: capturedImages)
-        navigationController?.popViewController(animated: true)
+        isDone += 1
+        if isDone == 1  {
+            print("done tapped")
+            activityIndicator.startAnimating()
+//            captureSession.removeInput(frontInput)
+//            captureSession.removeInput(backInput)
+            speechRecognizer.stopRecognizingSpeech()
+            captureImageDelegate.didReturnCapturedImages(with: capturedImages)
+            navigationController?.popViewController(animated: true)
+        }
+        
     }
     
     //MARK:- Camera Setup
@@ -132,7 +154,6 @@ class CaptureImageVC: UIViewController {
             fatalError("no front camera")
         }
         
-        //now we need to create an input objects from our devices
         guard let bInput = try? AVCaptureDeviceInput(device: backCamera) else {
             fatalError("could not create input device from back camera")
         }
@@ -270,7 +291,6 @@ extension CaptureImageVC: AVCaptureVideoDataOutputSampleBufferDelegate {
     
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        
         if !takePicture {
             return
         }
@@ -299,7 +319,6 @@ extension CaptureImageVC : SpeechRecognizerDelegate {
         if keyword == .takePicture {
             captureImageAction()
         } else if keyword == .done {
-            print("done action")
             doneAction()
             return
         }
