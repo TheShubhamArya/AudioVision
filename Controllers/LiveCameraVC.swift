@@ -48,7 +48,6 @@ class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelega
         previewLayer.videoGravity = .resizeAspectFill
         
         view.addSubview(tintView)
-//        tintView.addSubview(label)
         
         label.numberOfLines = 0
         
@@ -59,11 +58,6 @@ class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelega
             tintView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tintView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tintView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
-//            label.topAnchor.constraint(equalTo: tintView.topAnchor),
-//            label.leadingAnchor.constraint(equalTo: tintView.leadingAnchor),
-//            label.trailingAnchor.constraint(equalTo: tintView.trailingAnchor),
-//            label.bottomAnchor.constraint(equalTo: tintView.bottomAnchor)
         ])
         view.addSubview(captureButton)
         view.addSubview(label)

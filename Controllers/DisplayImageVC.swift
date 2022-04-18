@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol DisplayImageProtocol {
+protocol DisplayImageProtocol : AnyObject {
     func displayImageExited(afterEditing editedImages: [UIImage])
 }
 
@@ -15,7 +15,7 @@ class DisplayImageVC: UIViewController {
     
     var collectionView : UICollectionView!
     var capturedImages : [UIImage]!
-    var delegate : DisplayImageProtocol!
+    weak var delegate : DisplayImageProtocol!
     
     override func viewDidLoad() {
         super.viewDidLoad()

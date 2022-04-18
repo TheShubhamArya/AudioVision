@@ -43,7 +43,6 @@ extension CaptureImageVC : UIGestureRecognizerDelegate {
            capturedImageView1.widthAnchor.constraint(equalToConstant: 100)
        ])
        
-        //       switchCameraButton.addTarget(self, action: #selector(switchCamera(_:)), for: .touchUpInside)
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(capturedImageTapped))
         let rightGesture = UISwipeGestureRecognizer(target: self, action: #selector(capturedImageSwipped(_ :)))
         rightGesture.direction = .right
@@ -59,10 +58,6 @@ extension CaptureImageVC : UIGestureRecognizerDelegate {
         capturedImageView1.addGestureRecognizer(downGesture)
         captureImageButton.addTarget(self, action: #selector(captureButtonTapped(_:)), for: .touchUpInside)
     }
-    
-//    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-//        return (gestureRecognizer == touch && otherGestureRecognizer == pan)
-//     }
     
     //MARK:- Permissions
     func checkPermissions() {

@@ -20,8 +20,6 @@ class SpeechService {
         let utterance = AVSpeechUtterance(string: speechTexts[row])
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance.volume = 1.0
-//        utterance.rate  =  0.1
-//        utterance.pitchMultiplier = 0.5
         synthesizer.speak(utterance)
     }
     

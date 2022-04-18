@@ -8,21 +8,19 @@
 import UIKit
 import AVFoundation
 
-protocol CapturedImageProtocol {
+protocol CapturedImageProtocol : AnyObject {
     func didReturnCapturedImages(with images: [UIImage])
 }
 
 class CaptureImageVC: UIViewController {
 
-    var captureImageDelegate : CapturedImageProtocol!
+    weak var captureImageDelegate : CapturedImageProtocol!
     
     var captureSession : AVCaptureSession!
     let systemSoundID: SystemSoundID = 1108
     
     var backCamera : AVCaptureDevice!
-    var frontCamera : AVCaptureDevice!
     var backInput : AVCaptureInput!
-    var frontInput : AVCaptureInput!
     
     var previewLayer : AVCaptureVideoPreviewLayer!
     
@@ -30,7 +28,7 @@ class CaptureImageVC: UIViewController {
     
     var takePicture = false
     var backCameraOn = true
-    var  isDone = 0
+    var isDone = true
     
     var capturedImages = [UIImage]()
 
@@ -58,6 +56,10 @@ class CaptureImageVC: UIViewController {
     let capturedImageView2 = CaptureImageView()
     let capturedImageView3 = CaptureImageView()
     
+    deinit {
+        print("capture image VC deinit")
+    }
+    
     let speechRecognizer = SpeechRecognizer()
     
     //MARK:- Life Cycle
@@ -70,32 +72,15 @@ class CaptureImageVC: UIViewController {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            activityIndicator.heightAnchor.constraint(equalToConstant: 50),
+            activityIndicator.widthAnchor.constraint(equalToConstant: 50)
         ])
+//        activityIndicator.startAnimating()
         navigationItem.setHidesBackButton(true, animated: true)
         navigationItem.hidesBackButton = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneAction))
     }
-    
-//    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-//       get {
-//          return .portrait
-//       }
-//    }
-//    
-//    override var shouldAutorotate: Bool {
-//        return false
-//    }
-//
-//    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-//        return UIInterfaceOrientation.portrait
-//    }
-//
-//    override func viewWillLayoutSubviews() {
-//        super.viewWillLayoutSubviews()
-//        print("view will layout subviews")
-//        setupView()
-//    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -104,15 +89,14 @@ class CaptureImageVC: UIViewController {
     }
     
     @objc func doneAction() {
-        isDone += 1
-        if isDone == 1  {
-            print("done tapped")
+        if isDone  {
+            isDone = false
             activityIndicator.startAnimating()
-//            captureSession.removeInput(frontInput)
-//            captureSession.removeInput(backInput)
+            captureSession.stopRunning()
+            captureSession.removeInput(backInput)
             speechRecognizer.stopRecognizingSpeech()
             captureImageDelegate.didReturnCapturedImages(with: capturedImages)
-            navigationController?.popViewController(animated: true)
+            self.navigationController?.popViewController(animated: true)
         }
         
     }
@@ -148,26 +132,12 @@ class CaptureImageVC: UIViewController {
             fatalError("no back camera")
         }
         
-        if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
-            frontCamera = device
-        } else {
-            fatalError("no front camera")
-        }
-        
         guard let bInput = try? AVCaptureDeviceInput(device: backCamera) else {
             fatalError("could not create input device from back camera")
         }
         backInput = bInput
         if !captureSession.canAddInput(backInput) {
             fatalError("could not add back camera input to capture session")
-        }
-        
-        guard let fInput = try? AVCaptureDeviceInput(device: frontCamera) else {
-            fatalError("could not create input device from front camera")
-        }
-        frontInput = fInput
-        if !captureSession.canAddInput(frontInput) {
-            fatalError("could not add front camera input to capture session")
         }
         
         captureSession.addInput(backInput)
@@ -194,29 +164,6 @@ class CaptureImageVC: UIViewController {
         previewLayer.frame = self.view.layer.frame
     }
     
-    func switchCameraInput(){
-        //don't let user spam the button, fun for the user, not fun for performance
-//        switchCameraButton.isUserInteractionEnabled = false
-        
-        captureSession.beginConfiguration()
-        if backCameraOn {
-            captureSession.removeInput(backInput)
-            captureSession.addInput(frontInput)
-            backCameraOn = false
-        } else {
-            captureSession.removeInput(frontInput)
-            captureSession.addInput(backInput)
-            backCameraOn = true
-        }
-        
-        videoOutput.connections.first?.videoOrientation = .portrait
-        
-        videoOutput.connections.first?.isVideoMirrored = !backCameraOn
-        
-        captureSession.commitConfiguration()
-    }
-    
-    //MARK:- Actions
     @objc func captureButtonTapped(_ sender: UIButton?){
         captureImageAction()
     }

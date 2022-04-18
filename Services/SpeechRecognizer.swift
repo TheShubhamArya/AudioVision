@@ -7,7 +7,7 @@
 
 import Speech
 
-protocol SpeechRecognizerDelegate {
+protocol SpeechRecognizerDelegate : AnyObject {
     func didSayCorrectKeyword(for keyword: KeyWords)
 }
 
@@ -17,7 +17,7 @@ class SpeechRecognizer {
     let speechRecognizer : SFSpeechRecognizer? = SFSpeechRecognizer()
     var request = SFSpeechAudioBufferRecognitionRequest()
     var recognitionTask : SFSpeechRecognitionTask?
-    var speechRecognizerDelegate : SpeechRecognizerDelegate!
+    weak var speechRecognizerDelegate : SpeechRecognizerDelegate!
     var node : AVAudioInputNode?
     
 //    let keyWordDict : [String:KeyWords] = ["open camera":.openCamera, "open the camera":.openCamera, "open a camera":.openCamera, "open photos": .openPhotoLibrary, "open photo library": .openPhotoLibrary, "open the photos": .openPhotoLibrary, "select photos": .openPhotoLibrary, "select from photos": .openPhotoLibrary, "select from photo library": .openPhotoLibrary,
@@ -111,8 +111,8 @@ class SpeechRecognizer {
     
     func stopRecognizingSpeech() {
         print("stop  recognizing speech function")
-        audioEngine.stop()
         node?.removeTap(onBus: 0)
+        audioEngine.stop()
         self.recognitionTask = nil
     }
     

@@ -13,6 +13,7 @@ import PDFKit
 extension HomeVC : CapturedImageProtocol {
     
     func openCamera() {
+        speechService.stopSpeaking()
         let captureImageVC = CaptureImageVC()
         captureImageVC.captureImageDelegate = self
         navigationController?.pushViewController(captureImageVC, animated: true)

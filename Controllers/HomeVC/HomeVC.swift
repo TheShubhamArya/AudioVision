@@ -46,11 +46,15 @@ class HomeVC : UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        speechRecognizer.speechRecognitionAuthorization()
-        let vc = WelcomeView()
-        let host = UIHostingController(rootView: vc)
-        present(host, animated: true, completion: nil)
-        UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+        if speechRecognizer.node == nil {
+            speechRecognizer.speechRecognitionAuthorization()
+        } else {
+            speechRecognizer.stopRecognizingSpeech()
+            speechRecognizer.recognizeSpeech()
+        }
+//        let vc = WelcomeView()
+//        let host = UIHostingController(rootView: vc)
+//        present(host, animated: true, completion: nil)
     }
     
     func setupNavbar() {
