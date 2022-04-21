@@ -19,9 +19,6 @@ class SpeechRecognizer {
     var recognitionTask : SFSpeechRecognitionTask?
     weak var speechRecognizerDelegate : SpeechRecognizerDelegate!
     var node : AVAudioInputNode?
-    
-//    let keyWordDict : [String:KeyWords] = ["open camera":.openCamera, "open the camera":.openCamera, "open a camera":.openCamera, "open photos": .openPhotoLibrary, "open photo library": .openPhotoLibrary, "open the photos": .openPhotoLibrary, "select photos": .openPhotoLibrary, "select from photos": .openPhotoLibrary, "select from photo library": .openPhotoLibrary,
-//                                           "": .readFromFiles,"": .takePicture, "": .done, "": .readToMe, "": .readPrevious, "": .readNext]
 
     func recognizeSpeech() {
         print("recognize speech function")
@@ -85,6 +82,13 @@ class SpeechRecognizer {
         let readNext = speech.contains(KeyWords.readNext.rawValue)
         let readPrevious = speech.contains(KeyWords.readPrevious.rawValue)
         let done = speech.contains(KeyWords.done.rawValue)
+        let openLiveDetection = speech.contains(KeyWords.openLiveDetection.rawValue)
+        let start = speech.contains(KeyWords.start.rawValue)
+        let stop =  speech.contains(KeyWords.stop.rawValue)
+        let read = speech.contains(KeyWords.read.rawValue)
+        let continu = speech.contains(KeyWords.continu.rawValue)
+        let quitLiveDetection = speech.contains(KeyWords.quitLiveDetection.rawValue)
+        let openImageStitching = speech.contains(KeyWords.openImageStitching.rawValue)
         if openCamera {
             return (true, .openCamera)
         } else if takePicture {
@@ -105,6 +109,20 @@ class SpeechRecognizer {
             return (true, .readPrevious)
         } else if done {
             return (true, .done)
+        } else if openLiveDetection {
+            return (true, .openLiveDetection)
+        } else if start {
+            return (true, .start)
+        } else if stop {
+            return (true, .stop)
+        } else if read {
+            return (true, .read)
+        } else if continu {
+            return (true, .continu)
+        } else if quitLiveDetection {
+            return (true, .quitLiveDetection)
+        } else if openImageStitching {
+            return (true, .openImageStitching)
         }
         return (false, .none)
     }

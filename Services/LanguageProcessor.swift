@@ -89,7 +89,7 @@ class LanguageProcessor {
             }
            
         } while true
-//        print(correctedText)
+        
         return correctedText
     }
     
@@ -132,19 +132,4 @@ class LanguageProcessor {
             return "😫"
         }
     }
-    
-    func embedCheck(word: String){
-        // Get the OS embeddings for the given language
-        let embedding = NLEmbedding.wordEmbedding(for: .english)
-        
-        // Find the 5 words that are nearest to the input word based on the embedding
-        let res = embedding?.neighbors(for: word, maximumCount: 5)
-        // Print the words
-        print(res ?? [])
-    }
-    
-    func retrieveNeighebors() {
-        
-    }
-    
 }

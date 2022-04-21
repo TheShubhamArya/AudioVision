@@ -8,7 +8,7 @@
 import AVFoundation
 import UIKit
 
-class SpeechService {
+class SpeechSynthesizer {
     
     let synthesizer = AVSpeechSynthesizer()
     var speechTexts = [String]()
@@ -18,6 +18,13 @@ class SpeechService {
     
     func startSpeaking(for row: Int){
         let utterance = AVSpeechUtterance(string: speechTexts[row])
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.volume = 1.0
+        synthesizer.speak(utterance)
+    }
+    
+    func startSpeaking(with text: String) {
+        let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance.volume = 1.0
         synthesizer.speak(utterance)

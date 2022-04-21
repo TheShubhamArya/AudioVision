@@ -16,8 +16,12 @@ class HomeVC : UIViewController {
     var visionImages = [UIImage]()
     var currentReadingCell = 0
     var frontView = FrontView()
-    let speechService = SpeechService()
+    
+    let languageProcessor = LanguageProcessor()
+    let speechService = SpeechSynthesizer()
     let speechRecognizer = SpeechRecognizer()
+    var didOpenCamera = true
+    var didOpenLiveDetection = true
     
     let activityIndicator : UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(style: .large)
@@ -27,10 +31,11 @@ class HomeVC : UIViewController {
     }()
     
     let controlView = ControlView()
-    let languageProcessor = LanguageProcessor()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupNavbar()
         speechRecognizer.speechRecognizerDelegate = self
         view.backgroundColor = .systemBackground
@@ -52,6 +57,8 @@ class HomeVC : UIViewController {
             speechRecognizer.stopRecognizingSpeech()
             speechRecognizer.recognizeSpeech()
         }
+        didOpenCamera = true
+        didOpenLiveDetection = true
 //        let vc = WelcomeView()
 //        let host = UIHostingController(rootView: vc)
 //        present(host, animated: true, completion: nil)
@@ -64,29 +71,25 @@ class HomeVC : UIViewController {
     }
     
     @objc func tutorialButtonTapped() {
-        let tutorialVC = TutorialVC()
-        navigationController?.pushViewController(tutorialVC, animated: true)
+        let vc = TutorialView()
+        let host = UIHostingController(rootView: vc)
+        navigationController?.pushViewController(host, animated: true)
     }
     
     @objc func mediaTypeAlert() {
         let actionSheet = UIAlertController(title: "Select Media Type", message: "", preferredStyle: .actionSheet)
         
+        let liveDetection = UIAlertAction(title: "Live Detection", style: .default) { [weak self]_ in
+            self?.openLiveCameraView()
+        }
+        
+        let imageStitch = UIAlertAction(title: "Image Stitching Detection", style: .default) { [weak self] _ in
+            self?.openImageStitcherView()
+        }
+        
         let camera = UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
             self?.speechService.speechTexts = []
             self?.openCamera()
-        }
-        
-        let photoLibrary = UIAlertAction(title: "Photo Library", style: .default) { [weak self] _ in
-            self?.speechService.speechTexts = []
-            self?.pickPhotos()
-        }
-        
-        let documents = UIAlertAction(title: "Documents", style: .default) { [weak self] _ in
-            self?.openFilesApp()
-        }
-        
-        let liveDetection = UIAlertAction(title: "Live Detection", style: .default) { [weak self]_ in
-            self?.openLiveCameraView()
         }
         
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
@@ -95,10 +98,10 @@ class HomeVC : UIViewController {
           popoverPresentationController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
           popoverPresentationController.permittedArrowDirections = []
         }
-        actionSheet.addAction(camera)
-        actionSheet.addAction(photoLibrary)
-        actionSheet.addAction(documents)
         actionSheet.addAction(liveDetection)
+        actionSheet.addAction(imageStitch)
+        actionSheet.addAction(camera)
+        
         actionSheet.addAction(cancel)
         present(actionSheet, animated: true)
     }
@@ -108,10 +111,19 @@ class HomeVC : UIViewController {
         return context.createCGImage(inputImage, from: inputImage.extent)
     }
     
-    func openLiveCameraView() {
-        speechRecognizer.stopRecognizingSpeech()
-        let vc = LiveCameraVC()
+    func openImageStitcherView() {
+        let vc = ImageStitcherVC()
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func openLiveCameraView() {
+        if didOpenLiveDetection {
+            didOpenLiveDetection = false
+            speechRecognizer.stopRecognizingSpeech()
+            let vc = LiveCameraVC()
+            navigationController?.pushViewController(vc, animated: true)
+        }
+        
     }
     
     func recognizeText(with image: UIImage?,_ type:Int = 0) {
@@ -142,6 +154,7 @@ class HomeVC : UIViewController {
             let text = observations.compactMap ({
                 $0.topCandidates(1).first?.string
             }).joined(separator: "\n")
+            
             let correctedtText = self.languageProcessor.getCorrectedText(for: text)
             self.speechService.speechTexts.append(correctedtText)
             let emojiStr = self.languageProcessor.getEmojiSentiment(with: text)
@@ -175,14 +188,15 @@ extension HomeVC : SpeechRecognizerDelegate {
             playButtonTapped()
         }  else if keyword == .pause {
             playButtonTapped()
-        } else if keyword == .readFromFiles {
-            openFilesApp()
-        } else if keyword == .openPhotoLibrary {
-            pickPhotos()
         } else if keyword == .readNext {
             forwardButtonTapped()
         } else if keyword == .readPrevious{
             backButtonTapped()
+        } else if keyword == .openLiveDetection {
+            openLiveCameraView()
+            return
+        } else if keyword == .openImageStitching {
+            openImageStitcherView()
         }
         speechRecognizer.recognizeSpeech()
     }

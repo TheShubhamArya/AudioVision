@@ -11,7 +11,7 @@ import AVFoundation
 class PageCell: UICollectionViewCell {
     
     static let identifier = "pageCellIdentifier"
-    var service = SpeechService()
+    var service = SpeechSynthesizer()
     
     private var cardViews : (frontView: UIView, backView: UIView)?
     var frontView = FrontView()
@@ -27,7 +27,7 @@ class PageCell: UICollectionViewCell {
         cardViews = (frontView: frontView, backView: backView)
     }
     
-    public func configure(_ speechService: SpeechService,at indexPath: IndexPath,_ image: UIImage) {
+    public func configure(_ speechService: SpeechSynthesizer,at indexPath: IndexPath,_ image: UIImage) {
         let item = indexPath.item
         
         frontView.textView.text = speechService.speechTexts[item]

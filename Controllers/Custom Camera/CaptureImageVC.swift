@@ -76,7 +76,7 @@ class CaptureImageVC: UIViewController {
             activityIndicator.heightAnchor.constraint(equalToConstant: 50),
             activityIndicator.widthAnchor.constraint(equalToConstant: 50)
         ])
-//        activityIndicator.startAnimating()
+        
         navigationItem.setHidesBackButton(true, animated: true)
         navigationItem.hidesBackButton = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneAction))

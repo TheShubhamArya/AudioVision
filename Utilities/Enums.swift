@@ -18,5 +18,12 @@ enum KeyWords: String {
     case readPrevious = "read previous"
     case openPhotoLibrary = "open photo library"
     case readFromFiles = "read from files"
+    case openLiveDetection = "open live detection"
+    case start = "start"
+    case stop = "stop"
+    case read = "read"
+    case continu = "continue"
+    case quitLiveDetection = "quit live detection"
+    case openImageStitching = "open image stitching"
     case none = ""
 }

@@ -5,30 +5,27 @@
 //  Created by Shubham Arya on 4/15/22.
 //
 
-import Vision
-import CoreImage
 import UIKit
+import Vision
 
-class ImageRegistration {
+enum Error {
+    case requestHandler
+}
+
+class ImageStitcher {
     
-    // This is a singleton instance of ImageRegistration.
-    static let shared = ImageRegistration()
+    static let shared = ImageStitcher()
     
     // This is a CIContext for image rendering.
     private let context = CIContext()
     
-    // You can only access this class through the shared singleton instance.
     private init() {}
     
     /// Contains cases that correspond to different mechanism types for image registration.
-    enum Mechanism: String, Identifiable, CaseIterable {
+    enum Mechanism: String, CaseIterable {
         
         case translational
         case homographic
-        
-        // Identifiable conformance for use as ForEach data.
-        var id: String { rawValue }
-        
         // This is a string that describes the case name.
         var label: String { rawValue.capitalized }
     }
@@ -36,36 +33,41 @@ class ImageRegistration {
     // MARK: Vision Functions
     
     ///- Tag: Register
-    func register(floatingImage: UIImage,
-                  referenceImage: UIImage,
-                  registrationMechanism: ImageRegistration.Mechanism,
-                  _ completion: @escaping (_ compositedImage: UIImage, _ paddedBackground: UIImage) -> Void) {
+    func register(ciFloatingImage: CIImage,
+                  ciReferenceImage: CIImage,
+                  registrationMechanism: ImageStitcher.Mechanism,
+                  _ completion: @escaping (_ compositedImage: UIImage,_ error: Error?) -> Void) {
         
-        let ciReferenceImage = CIImage(referenceImage)
-        let ciFloatingImage = CIImage(floatingImage)
+        let uiFloatingImage = UIImage(ciImage: ciFloatingImage).fixOrientation
+        let uiReferenceImage = UIImage(ciImage: ciReferenceImage).fixOrientation.resizeImage(targetSize: uiFloatingImage.size)
+        
+        let ciRefImage = CIImage(image: uiReferenceImage) ?? ciReferenceImage
+        let ciFloatImage = CIImage(image: uiFloatingImage) ?? ciFloatingImage
         
         // Let the Vision work take place on another queue, but hop back onto the main queue to record the results.
         DispatchQueue.global(qos: .userInitiated).async {
             
             // Create the request handler with the reference image.
-            let imageRequestHandler = VNImageRequestHandler(ciImage: ciReferenceImage)
+            let imageRequestHandler = VNImageRequestHandler(ciImage: ciRefImage)
             
             let request: VNImageRegistrationRequest
             
             // Create the registration request depending on the registration mechanism using the floating image.
             switch registrationMechanism {
             case .translational:
-                request = VNTranslationalImageRegistrationRequest(targetedCIImage: ciFloatingImage)
+                request = VNTranslationalImageRegistrationRequest(targetedCIImage: ciFloatImage)
                 
             case .homographic:
-                request = VNHomographicImageRegistrationRequest(targetedCIImage: ciFloatingImage)
+                request = VNHomographicImageRegistrationRequest(targetedCIImage: ciFloatImage)
             }
             
             // Perform the registration request.
             do {
                 try imageRequestHandler.perform([request])
             } catch {
+                print("oops something has gone wrong")
                 print(error.localizedDescription)
+                completion(uiReferenceImage, Error.requestHandler)
             }
             
             // Hop back onto the main queue to handle the results of the registration request.
@@ -73,29 +75,21 @@ class ImageRegistration {
                 
                 guard let alignmentObservation = request.results?.first as? VNImageAlignmentObservation else { return }
                 
-                let ciAlignedImage = self.makeAlignedImage(floatingImage: ciFloatingImage, alignmentObservation: alignmentObservation)
+                let ciAlignedImage = self.makeAlignedImage(floatingImage: ciFloatImage, alignmentObservation: alignmentObservation)
                 
                 // Composites the aligned image on top of the reference image.
-                let composite = ciAlignedImage.composited(over: ciReferenceImage)
+                let composite = ciAlignedImage.composited(over: ciRefImage)
                             
                 // Convert the composited CIImage to PlatformImage (either NSImage or UIImage, depending on the platform).
                 let cgComposite = self.context.createCGImage(composite, from: composite.extent)!
                 let compositeImage = UIImage(cgImage: cgComposite)
                 
-                // Pads the reference image to have the same dimensions as the composite image,
-                //  which is useful for comparing the alignment with the reference image.
-                let paddedReference = ciReferenceImage.cropped(to: composite.extent)
-                               
-                // Convert the padded reference image to PlatformImage.
-                let cgPaddedReferenceImage = self.context.createCGImage(paddedReference, from: composite.extent)!
-                
-                let paddedReferenceImage = UIImage(cgImage: cgPaddedReferenceImage)
-                
                 // Call the completion handler with the compositeImage and the paddedReferenceImage.
-                completion(compositeImage, paddedReferenceImage)
+                completion(compositeImage, nil)
             }
         }
     }
+    
     
     ///- Tag: MakeAlignedImage
     private func makeAlignedImage(floatingImage: CIImage, alignmentObservation: VNImageAlignmentObservation) -> CIImage {
@@ -171,5 +165,19 @@ class ImageRegistration {
     }
 }
 
+extension UIImage {
+    
+    func resizeImage(targetSize: CGSize) -> UIImage {
+        
+        let rect = CGRect(x: 0, y: 0, width: targetSize.width, height: targetSize.height)
+       
+       // Actually do the resizing to the rect using the ImageContext stuff
+       UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
+       self.draw(in: rect)
+       let newImage = UIGraphicsGetImageFromCurrentImageContext()
+       UIGraphicsEndImageContext()
+       
+       return newImage!
+   }
 
-
+}
