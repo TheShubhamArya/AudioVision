@@ -12,10 +12,5 @@ struct NavigationViewController: UIViewControllerRepresentable {
         let navVC = UINavigationController(rootViewController: vc)
         return navVC
     }
-    
-    
-    func application(application: UIApplication, supportedInterfaceOrientationsForWindow window: UIWindow?) -> UIInterfaceOrientationMask {
-        return UIInterfaceOrientationMask.portrait
-    }
 }
 

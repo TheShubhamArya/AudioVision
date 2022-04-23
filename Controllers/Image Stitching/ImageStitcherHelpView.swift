@@ -2,31 +2,34 @@
 //  SwiftUIView.swift
 //  
 //
-//  Created by Shubham Arya on 4/19/22.
+//  Created by Shubham Arya on 4/23/22.
 //
 
 import SwiftUI
 
-struct LiveCameraHelpView: View {
+struct ImageStitcherHelpView: View {
     @State private var didTapNext = 0
     @State var prevValue = 0
     var body: some View {
         NavigationView{
             VStack {
-                Text("Here are some commands that are supported for the live text detection")
+                Text("Here are some commands that are supported for the image stitching text detection")
                     .padding()
                 
                 if didTapNext == 0 {
-                    CommandCell(image: "play",headline: "\"Start\"",subtitle: "This command starts live text detection from your camera", prevValue: prevValue, didTapNext: didTapNext)
+                    CommandCell(image: "play",headline: "\"Start\"",subtitle: "This command starts capturing images for image stitching.", prevValue: prevValue, didTapNext: didTapNext)
                     
                 } else if didTapNext == 1 {
-                    CommandCell(image: "pause",headline: "\"Stop\"",subtitle: "This command stops live text detection from your camera so you can focus on the text detected.",prevValue: prevValue, didTapNext: didTapNext)
+                    CommandCell(image: "pause",headline: "\"Stop\"",subtitle: "This command stops capturing images for image stitching.",prevValue: prevValue, didTapNext: didTapNext)
                 } else if didTapNext == 2 {
-                    CommandCell(image: "speaker.wave.2.fill",headline: "\"Read\"",subtitle: "This reads the text detected by you. This command can be used only after you STOP live detection. This command reads text from the starting", prevValue: prevValue, didTapNext: didTapNext)
+                    CommandCell(image: "speaker.wave.2.fill",headline: "\"Read\"",subtitle: "This reads the text detected by you. This command can be used only after you STOP live detection. This command reads text from the starting.", prevValue: prevValue, didTapNext: didTapNext)
                 } else if didTapNext == 3 {
-                    CommandCell(image: "chevron.left.circle.fill",headline: "\"Quit Live Detection\"",subtitle: "This command quits live detection and takes you to the home screen", prevValue: prevValue, didTapNext: didTapNext)
+                    CommandCell(image: "chevron.left.circle.fill",headline: "\"Quit Image Stitching\"",subtitle: "This command quits image stitching screen and takes you to the home screen.", prevValue: prevValue, didTapNext: didTapNext)
                     
                 } else if didTapNext == 4 {
+                    CommandCell(image: "chevron.backward.circle.fill",headline: "Done",subtitle: "This command takes you from the current screen with stitched image to the screen to stitch images again.", prevValue: prevValue, didTapNext: didTapNext)
+                    
+                }  else if didTapNext == 5 {
                     CommandCell(color: .green, image: "checkmark.circle.fill",headline: "You're all set!",subtitle: "Let's find text in images.", prevValue: prevValue, didTapNext: didTapNext)
                         .transition(.scale)
                     
@@ -130,8 +133,9 @@ struct LiveCameraHelpView: View {
     }
 }
 
-struct LiveCameraHelpView_Previews: PreviewProvider {
+struct ImageStitcherHelpView_Previews: PreviewProvider {
     static var previews: some View {
-        LiveCameraHelpView()
+        ImageStitcherHelpView()
     }
 }
+

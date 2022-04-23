@@ -81,7 +81,7 @@ class LanguageProcessor {
             } else {
                 let guesses = textChecker.guesses(forWordRange: wordRange, in: text, language: "en") ?? [misspelledWord]
                 
-                print(misspelledWord, guesses)
+//                print(misspelledWord, guesses)
                 let closestGuess = getClosestMatchingWord(for: misspelledWord, with: guesses)
                 correctedText = correctedText.replacingOccurrences(of: misspelledWord, with: closestGuess)
                 

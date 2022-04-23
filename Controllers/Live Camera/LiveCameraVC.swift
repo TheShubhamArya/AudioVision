@@ -12,8 +12,6 @@ import SwiftUI
 
 class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     
-    let synthesizer = AVSpeechSynthesizer()
-    
     let captureSession : AVCaptureSession = {
         let captureSession = AVCaptureSession()
         captureSession.sessionPreset = .iFrame960x540
@@ -200,13 +198,11 @@ class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelega
     func progressAnimation(duration: TimeInterval) {
         CATransaction.begin()
         let circularProgressAnimation = CABasicAnimation(keyPath: "strokeEnd")
-        // set the end time
         circularProgressAnimation.duration = duration
         circularProgressAnimation.toValue = 1.0
         circularProgressAnimation.fillMode = .forwards
         circularProgressAnimation.isRemovedOnCompletion = false
         CATransaction.setCompletionBlock { [weak self] in
-//            print("Animation is done do something again", Date())
             if self?.pauseButtonState ?? true {
                 self?.captureFrame = true
             }
@@ -302,7 +298,8 @@ extension LiveCameraVC : SpeechRecognizerDelegate {
             isSpeaking = true
             speechActions()
             
-        } else if keyword == .pause {
+        }
+        else if keyword == .pause {
             isSpeaking = false
             speechActions()
             

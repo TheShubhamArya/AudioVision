@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TutorialView: View {
+    var fromHomeView = false
     @State private var didTapNext = 0
     @State var prevValue = 0
     var body: some View {
@@ -16,26 +17,32 @@ struct TutorialView: View {
                 .padding()
             
             if didTapNext == 0 {
-                CommandCell(image: "camera",headline: "\"Open Camera\"",subtitle: "This command opens the camera for you to take images", prevValue: prevValue, didTapNext: didTapNext)
-                 
-            } else if didTapNext == 1 {
-                CommandCell(image: "camera.metering.partial",headline: "\"Take Picture\"",subtitle: "This command takes a picture when the camera is open. You can use this command to take multiple pictures.",prevValue: prevValue, didTapNext: didTapNext)
+                CommandCell(image: "video.fill",headline: "\"Open Live Detection\"",subtitle: "This command opens the live text detection screen for you.", prevValue: prevValue, didTapNext: didTapNext)
+            } else if didTapNext == 1{
+                CommandCell(image: "photo.fill.on.rectangle.fill",headline: "\"Open Image Stitching\"",subtitle: "This command opens the image stitching screen  for you.", prevValue: prevValue, didTapNext: didTapNext)
             } else if didTapNext == 2 {
-                CommandCell(image: "eye.fill",headline: "\"Done\"",subtitle: "This will remove the camera view from the screen and process the pictures for text.", prevValue: prevValue, didTapNext: didTapNext)
-            } else if didTapNext == 3 {
-                CommandCell(image: "speaker.wave.2.fill",headline: "\"Read to Me\"",subtitle: "This commands reads the processed text to you on your speaker. Make sure to have volume up.", prevValue: prevValue, didTapNext: didTapNext)
+                CommandCell(image: "camera",headline: "\"Open Camera\"",subtitle: "This command opens the camera for you to take images", prevValue: prevValue, didTapNext: didTapNext)
+            }else if didTapNext == 3 {
+                CommandCell(image: "play.fill",headline: "\"Start\"",subtitle: "This command starts the capturing action for live detection and image stitching.",prevValue: prevValue, didTapNext: didTapNext)
+                 
             } else if didTapNext == 4 {
-                CommandCell(image: "photo.fill",headline: "\"Open Photo Library\"",subtitle: "This command opens the photo library for you to select image from your photo library.", prevValue: prevValue, didTapNext: didTapNext)
+                CommandCell(image: "pause.fill",headline: "\"Stop\"",subtitle: "This command stops the capturing action for live detection and image stitching.",prevValue: prevValue, didTapNext: didTapNext)
             } else if didTapNext == 5 {
-                CommandCell(image: "folder.fill",headline: "\"Read from Files\"",subtitle: "This command opens the files app for you to select a file that you want to be read to you.", prevValue: prevValue, didTapNext: didTapNext)
+                CommandCell(image: "chevron.backward.circle.fill",headline: "\"Done\"",subtitle: "This will remove the camera view from the screen and process the pictures for text.", prevValue: prevValue, didTapNext: didTapNext)
             } else if didTapNext == 6 {
-                CommandCell(image: "video.fill",headline: "\"Open Live Detection\"",subtitle: "This command opens the live text detection screen so you can detect text in real time.", prevValue: prevValue, didTapNext: didTapNext)
-            }  else  {
+                CommandCell(image: "speaker.wave.2.fill",headline: "\"Read\"",subtitle: "This commands reads the processed text to you on your speaker. Make sure to have volume up.", prevValue: prevValue, didTapNext: didTapNext)
+            } else if didTapNext == 7 {
+                CommandCell(image: "photo.fill",headline: "\"Take Picture\"",subtitle: "This command opens the photo library for you to select image from your photo library.", prevValue: prevValue, didTapNext: didTapNext)
+            } else if didTapNext == 8 {
+                CommandCell(image: "video.slash.fill",headline: "\"Quit Live Detection\"",subtitle: "This command opens the files app for you to select a file that you want to be read to you.", prevValue: prevValue, didTapNext: didTapNext)
+            } else if didTapNext == 9 {
+                CommandCell(image: "rectangle.slash.fill",headline: "\"Quit Image Stitching\"",subtitle: "This command opens the live text detection screen so you can detect text in real time.", prevValue: prevValue, didTapNext: didTapNext)
+            }  else if didTapNext == 10  {
                 CommandCell(color: .green, image: "checkmark.circle.fill",headline: "You're all set!",subtitle: "Let's find text in images.", prevValue: prevValue, didTapNext: didTapNext)
                     .transition(.scale)
             }
             
-            if didTapNext < 7 {
+            if didTapNext < 10 {
                 HStack  {
 
                     Button {
@@ -54,7 +61,7 @@ struct TutorialView: View {
                         }
                     }
                     .padding()
-                    Text("\(didTapNext + 1) / **8** ")
+                    Text("\(didTapNext + 1) / **10** ")
                         .padding()
 
                     Button {
@@ -72,27 +79,30 @@ struct TutorialView: View {
                     .padding()
                 }
             } else  {
-                Button {
-                    if let topController = UIApplication.kTopViewController() {
-                        topController.dismiss(animated: true)
+                NavigationLink {
+                    if !fromHomeView   {
+                        NavigationViewController()
+                            .navigationBarHidden(true)
                     }
                 } label: {
-                    HStack {
-                        Text("Let's go")
-                    }
+                    Text(!fromHomeView ? "Done" : "")
                 }
                 .padding()
             }
             
             Spacer()
-                .navigationTitle("Speech commands")
-                .toolbar {
-                    Button("Skip") {
-                        if let topController = UIApplication.kTopViewController() {
-                            topController.dismiss(animated: true)
-                        }
+            .navigationTitle("Speech commands")
+            .toolbar {
+                NavigationLink {
+                    if !fromHomeView {
+                        NavigationViewController()
+                            .navigationBarHidden(true)
                     }
+                } label: {
+                    Text(!fromHomeView ? "skip" : "")
                 }
+            }
+            
         }
     }
     

@@ -25,5 +25,7 @@ enum KeyWords: String {
     case continu = "continue"
     case quitLiveDetection = "quit live detection"
     case openImageStitching = "open image stitching"
+    case quitImageStitching = "quit image stitching"
+    case dismiss = "dismiss"
     case none = ""
 }

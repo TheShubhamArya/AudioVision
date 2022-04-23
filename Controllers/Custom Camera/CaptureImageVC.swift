@@ -68,14 +68,6 @@ class CaptureImageVC: UIViewController {
         setupView()
         speechRecognizer.speechRecognizerDelegate = self
         speechRecognizer.speechRecognitionAuthorization()
-        view.addSubview(activityIndicator)
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            activityIndicator.heightAnchor.constraint(equalToConstant: 50),
-            activityIndicator.widthAnchor.constraint(equalToConstant: 50)
-        ])
         
         navigationItem.setHidesBackButton(true, animated: true)
         navigationItem.hidesBackButton = true
@@ -91,14 +83,12 @@ class CaptureImageVC: UIViewController {
     @objc func doneAction() {
         if isDone  {
             isDone = false
-            activityIndicator.startAnimating()
             captureSession.stopRunning()
             captureSession.removeInput(backInput)
             speechRecognizer.stopRecognizingSpeech()
             captureImageDelegate.didReturnCapturedImages(with: capturedImages)
             self.navigationController?.popViewController(animated: true)
         }
-        
     }
     
     //MARK:- Camera Setup
@@ -217,6 +207,8 @@ class CaptureImageVC: UIViewController {
         capturedImageView1.alpha = 0
         capturedImageView2.alpha = 0
         capturedImageView3.alpha = 0
+        
+        print("image count  is ", imageCount)
         
         if capturedImages.count >= 1 {
             capturedImageView1.alpha = 1

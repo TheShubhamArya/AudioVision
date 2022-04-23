@@ -20,6 +20,7 @@ class HomeVC : UIViewController {
     let languageProcessor = LanguageProcessor()
     let speechService = SpeechSynthesizer()
     let speechRecognizer = SpeechRecognizer()
+    let textDetector = TextDetector()
     var didOpenCamera = true
     var didOpenLiveDetection = true
     
@@ -44,7 +45,9 @@ class HomeVC : UIViewController {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            activityIndicator.heightAnchor.constraint(equalToConstant: 50),
+            activityIndicator.widthAnchor.constraint(equalToConstant: 50)
         ])
         
     }
@@ -67,11 +70,19 @@ class HomeVC : UIViewController {
     func setupNavbar() {
         self.title = "AudioVision"
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "camera.badge.ellipsis"), style: .plain, target: self, action: #selector(mediaTypeAlert))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Tutorial", style: .plain, target: self, action: #selector(tutorialButtonTapped))
+        let tutorialButton = UIBarButtonItem(title: "Tutorial", style: .plain, target: self, action: #selector(tutorialButtonTapped))
+        let aboutButton = UIBarButtonItem(title: "About", style: .plain, target: self, action: #selector(aboutButtonTapped))
+        navigationItem.rightBarButtonItems = [aboutButton, tutorialButton]
+    }
+    
+    @objc func aboutButtonTapped() {
+        let vc = WelcomeView(fromHomeVC: true)
+        let host = UIHostingController(rootView: vc)
+        navigationController?.pushViewController(host, animated: true)
     }
     
     @objc func tutorialButtonTapped() {
-        let vc = TutorialView()
+        let vc = TutorialView(fromHomeView: true)
         let host = UIHostingController(rootView: vc)
         navigationController?.pushViewController(host, animated: true)
     }
@@ -106,11 +117,6 @@ class HomeVC : UIViewController {
         present(actionSheet, animated: true)
     }
     
-    func convertCIImageToCGImage(inputImage: CIImage) -> CGImage! {
-        let context = CIContext(options: nil)
-        return context.createCGImage(inputImage, from: inputImage.extent)
-    }
-    
     func openImageStitcherView() {
         let vc = ImageStitcherVC()
         navigationController?.pushViewController(vc, animated: true)
@@ -122,56 +128,6 @@ class HomeVC : UIViewController {
             speechRecognizer.stopRecognizingSpeech()
             let vc = LiveCameraVC()
             navigationController?.pushViewController(vc, animated: true)
-        }
-        
-    }
-    
-    func recognizeText(with image: UIImage?,_ type:Int = 0) {
-        
-        var cgImage : CGImage?
-        if type == 0 {
-            guard let ciImage = image!.ciImage else {
-                print("ciimage error")
-                return
-            }
-            cgImage = convertCIImageToCGImage(inputImage: ciImage)
-            guard cgImage != nil else {
-                print("cg image error")
-                return
-            }
-        } else {
-            cgImage = image?.cgImage
-            guard cgImage != nil else {return}
-        }
-        
-        let handler = VNImageRequestHandler(cgImage: cgImage!, options: [:])
-        var recognizeTextRequest = VNRecognizeTextRequest()
-        recognizeTextRequest.recognitionLevel = .accurate
-        recognizeTextRequest = VNRecognizeTextRequest { request, error in
-            guard let observations = request.results as? [VNRecognizedTextObservation], error == nil else {
-                return
-            }
-            let text = observations.compactMap ({
-                $0.topCandidates(1).first?.string
-            }).joined(separator: "\n")
-            
-            let correctedtText = self.languageProcessor.getCorrectedText(for: text)
-            self.speechService.speechTexts.append(correctedtText)
-            let emojiStr = self.languageProcessor.getEmojiSentiment(with: text)
-            let emojiImg = emojiStr.toImage() ?? "⚠️".toImage()
-            self.speechService.emojis.append(emojiImg!)
-
-            DispatchQueue.main.async { [weak self] in
-                self?.collectionView.reloadData()
-                self?.addControlView()
-                self?.activityIndicator.stopAnimating()
-            }
-        }
-        
-        do {
-            try handler.perform([recognizeTextRequest])
-        } catch {
-            print(error)
         }
     }
     
@@ -186,13 +142,15 @@ extension HomeVC : SpeechRecognizerDelegate {
             return
         } else if keyword == .readToMe {
             playButtonTapped()
-        }  else if keyword == .pause {
-            playButtonTapped()
-        } else if keyword == .readNext {
-            forwardButtonTapped()
-        } else if keyword == .readPrevious{
-            backButtonTapped()
-        } else if keyword == .openLiveDetection {
+        }
+//        else if keyword == .pause {
+//            playButtonTapped()
+//        } else if keyword == .readNext {
+//            forwardButtonTapped()
+//        } else if keyword == .readPrevious{
+//            backButtonTapped()
+//        }
+        else if keyword == .openLiveDetection {
             openLiveCameraView()
             return
         } else if keyword == .openImageStitching {

@@ -21,7 +21,7 @@ class SpeechRecognizer {
     var node : AVAudioInputNode?
 
     func recognizeSpeech() {
-        print("recognize speech function")
+//        print("recognize speech function")
         request = SFSpeechAudioBufferRecognitionRequest()
         node = audioEngine.inputNode
         let recordingFormat = node?.outputFormat(forBus: 0)
@@ -89,6 +89,8 @@ class SpeechRecognizer {
         let continu = speech.contains(KeyWords.continu.rawValue)
         let quitLiveDetection = speech.contains(KeyWords.quitLiveDetection.rawValue)
         let openImageStitching = speech.contains(KeyWords.openImageStitching.rawValue)
+        let quitImageStitching = speech.contains(KeyWords.quitImageStitching.rawValue)
+        let dismiss = speech.contains(KeyWords.dismiss.rawValue)
         if openCamera {
             return (true, .openCamera)
         } else if takePicture {
@@ -123,6 +125,10 @@ class SpeechRecognizer {
             return (true, .quitLiveDetection)
         } else if openImageStitching {
             return (true, .openImageStitching)
+        }  else if dismiss  {
+            return (true, .dismiss)
+        } else  if  quitImageStitching {
+            return  (true, .quitImageStitching)
         }
         return (false, .none)
     }

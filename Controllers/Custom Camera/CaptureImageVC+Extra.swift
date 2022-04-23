@@ -11,38 +11,43 @@ import AVFoundation
 extension CaptureImageVC : UIGestureRecognizerDelegate {
     //MARK:- View Setup
     func setupView(){
-       view.backgroundColor = .black
+        view.backgroundColor = .black
         view.addSubview(captureImageButton)
+        view.addSubview(activityIndicator)
         view.addSubview(capturedImageView3)
         view.addSubview(capturedImageView2)
         view.addSubview(capturedImageView1)
         
-        
         capturedImageView2.rotate(angle: 7.5)
         capturedImageView3.rotate(angle: 15)
-       NSLayoutConstraint.activate([
-           
-           captureImageButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-           captureImageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-           captureImageButton.widthAnchor.constraint(equalToConstant: 80),
-           captureImageButton.heightAnchor.constraint(equalToConstant: 80),
-           
-           capturedImageView3.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-           capturedImageView3.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-           capturedImageView3.heightAnchor.constraint(equalToConstant: 150),
-           capturedImageView3.widthAnchor.constraint(equalToConstant: 100),
-           
-           capturedImageView2.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-           capturedImageView2.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-           capturedImageView2.heightAnchor.constraint(equalToConstant: 150),
-           capturedImageView2.widthAnchor.constraint(equalToConstant: 100),
-           
-           capturedImageView1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-           capturedImageView1.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-           capturedImageView1.heightAnchor.constraint(equalToConstant: 150),
-           capturedImageView1.widthAnchor.constraint(equalToConstant: 100)
-       ])
-       
+        NSLayoutConstraint.activate([
+            
+            captureImageButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            captureImageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            captureImageButton.widthAnchor.constraint(equalToConstant: 80),
+            captureImageButton.heightAnchor.constraint(equalToConstant: 80),
+            
+            capturedImageView3.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            capturedImageView3.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            capturedImageView3.heightAnchor.constraint(equalToConstant: 150),
+            capturedImageView3.widthAnchor.constraint(equalToConstant: 100),
+            
+            capturedImageView2.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            capturedImageView2.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            capturedImageView2.heightAnchor.constraint(equalToConstant: 150),
+            capturedImageView2.widthAnchor.constraint(equalToConstant: 100),
+            
+            capturedImageView1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            capturedImageView1.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            capturedImageView1.heightAnchor.constraint(equalToConstant: 150),
+            capturedImageView1.widthAnchor.constraint(equalToConstant: 100),
+            
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            activityIndicator.heightAnchor.constraint(equalToConstant: 50),
+            activityIndicator.widthAnchor.constraint(equalToConstant: 50)
+        ])
+        
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(capturedImageTapped))
         let rightGesture = UISwipeGestureRecognizer(target: self, action: #selector(capturedImageSwipped(_ :)))
         rightGesture.direction = .right
@@ -50,7 +55,7 @@ extension CaptureImageVC : UIGestureRecognizerDelegate {
         leftGesture.direction = .left
         let downGesture = UISwipeGestureRecognizer(target: self, action: #selector(capturedImageSwipped(_:)))
         downGesture.direction = .down
-    
+        
         capturedImageView1.isUserInteractionEnabled = true
         capturedImageView1.addGestureRecognizer(tapGestureRecognizer)
         capturedImageView1.addGestureRecognizer(rightGesture)
@@ -63,20 +68,20 @@ extension CaptureImageVC : UIGestureRecognizerDelegate {
     func checkPermissions() {
         let cameraAuthStatus =  AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
         switch cameraAuthStatus {
-          case .authorized:
+        case .authorized:
             return
-          case .denied:
+        case .denied:
             abort()
-          case .notDetermined:
+        case .notDetermined:
             AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler:
-            { (authorized) in
-              if(!authorized){
-                abort()
-              }
+                                            { (authorized) in
+                if(!authorized){
+                    abort()
+                }
             })
-          case .restricted:
+        case .restricted:
             abort()
-          @unknown default:
+        @unknown default:
             fatalError()
         }
     }
