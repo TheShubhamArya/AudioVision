@@ -9,7 +9,7 @@ import UIKit
 import AVFoundation
 
 extension CaptureImageVC : UIGestureRecognizerDelegate {
-    //MARK:- View Setup
+    
     func setupView(){
         view.backgroundColor = .black
         view.addSubview(captureImageButton)

@@ -13,6 +13,14 @@ struct ImageStitcherHelpView: View {
     var body: some View {
         NavigationView{
             VStack {
+                
+                Text("Point at text and **slowly** move from **UP to DOWN**")
+                    .padding()
+                
+                Text("This creates a long image to fit more text. Keep camera steady and keep orientation potrait for maximum detection.")
+                    .padding()
+                    .multilineTextAlignment(.center)
+                
                 Text("Here are some commands that are supported for the image stitching text detection")
                     .padding()
                 
@@ -22,7 +30,7 @@ struct ImageStitcherHelpView: View {
                 } else if didTapNext == 1 {
                     CommandCell(image: "pause",headline: "\"Stop\"",subtitle: "This command stops capturing images for image stitching.",prevValue: prevValue, didTapNext: didTapNext)
                 } else if didTapNext == 2 {
-                    CommandCell(image: "speaker.wave.2.fill",headline: "\"Read\"",subtitle: "This reads the text detected by you. This command can be used only after you STOP live detection. This command reads text from the starting.", prevValue: prevValue, didTapNext: didTapNext)
+                    CommandCell(image: "speaker.wave.2.fill",headline: "\"Read to me\"",subtitle: "This reads the text detected by you. This command can be used only after you STOP live detection. This command reads text from the starting.", prevValue: prevValue, didTapNext: didTapNext)
                 } else if didTapNext == 3 {
                     CommandCell(image: "chevron.left.circle.fill",headline: "\"Quit Image Stitching\"",subtitle: "This command quits image stitching screen and takes you to the home screen.", prevValue: prevValue, didTapNext: didTapNext)
                     

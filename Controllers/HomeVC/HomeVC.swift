@@ -15,12 +15,16 @@ class HomeVC : UIViewController {
     
     var visionImages = [UIImage]()
     var currentReadingCell = 0
-    var frontView = FrontView()
     
+    var frontView = FrontView()
+    let controlView = ControlView()
+    
+    // All Services that are used in this app
     let languageProcessor = LanguageProcessor()
     let speechService = SpeechSynthesizer()
     let speechRecognizer = SpeechRecognizer()
     let textDetector = TextDetector()
+    
     var didOpenCamera = true
     var didOpenLiveDetection = true
     
@@ -30,9 +34,6 @@ class HomeVC : UIViewController {
         activityIndicator.color = .gray
         return activityIndicator
     }()
-    
-    let controlView = ControlView()
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,7 +50,7 @@ class HomeVC : UIViewController {
             activityIndicator.heightAnchor.constraint(equalToConstant: 50),
             activityIndicator.widthAnchor.constraint(equalToConstant: 50)
         ])
-        
+        UserDefaults.standard.set(true, forKey: "firstTime")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -62,17 +63,23 @@ class HomeVC : UIViewController {
         }
         didOpenCamera = true
         didOpenLiveDetection = true
-//        let vc = WelcomeView()
-//        let host = UIHostingController(rootView: vc)
-//        present(host, animated: true, completion: nil)
+        let _ = Timer.scheduledTimer(timeInterval: 59, target: self, selector: #selector(restartSpeechRecognition), userInfo: nil, repeats: true)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        speechRecognizer.stopRecognizingSpeech()
+    }
+    
+    @objc func restartSpeechRecognition() {
+        speechRecognizer.stopRecognizingSpeech()
+        speechRecognizer.recognizeSpeech()
     }
     
     func setupNavbar() {
         self.title = "AudioVision"
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "camera.badge.ellipsis"), style: .plain, target: self, action: #selector(mediaTypeAlert))
-        let tutorialButton = UIBarButtonItem(title: "Tutorial", style: .plain, target: self, action: #selector(tutorialButtonTapped))
-        let aboutButton = UIBarButtonItem(title: "About", style: .plain, target: self, action: #selector(aboutButtonTapped))
-        navigationItem.rightBarButtonItems = [aboutButton, tutorialButton]
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Tutorial", style: .plain, target: self, action: #selector(tutorialButtonTapped))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "About", style: .plain, target: self, action: #selector(aboutButtonTapped))
     }
     
     @objc func aboutButtonTapped() {
@@ -85,36 +92,6 @@ class HomeVC : UIViewController {
         let vc = TutorialView(fromHomeView: true)
         let host = UIHostingController(rootView: vc)
         navigationController?.pushViewController(host, animated: true)
-    }
-    
-    @objc func mediaTypeAlert() {
-        let actionSheet = UIAlertController(title: "Select Media Type", message: "", preferredStyle: .actionSheet)
-        
-        let liveDetection = UIAlertAction(title: "Live Detection", style: .default) { [weak self]_ in
-            self?.openLiveCameraView()
-        }
-        
-        let imageStitch = UIAlertAction(title: "Image Stitching Detection", style: .default) { [weak self] _ in
-            self?.openImageStitcherView()
-        }
-        
-        let camera = UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
-            self?.speechService.speechTexts = []
-            self?.openCamera()
-        }
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        if let popoverPresentationController = actionSheet.popoverPresentationController {
-          popoverPresentationController.sourceView = self.view
-          popoverPresentationController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-          popoverPresentationController.permittedArrowDirections = []
-        }
-        actionSheet.addAction(liveDetection)
-        actionSheet.addAction(imageStitch)
-        actionSheet.addAction(camera)
-        
-        actionSheet.addAction(cancel)
-        present(actionSheet, animated: true)
     }
     
     func openImageStitcherView() {
@@ -133,6 +110,7 @@ class HomeVC : UIViewController {
     
 }
 
+//MARK: - Speech Recognizer delegate
 extension HomeVC : SpeechRecognizerDelegate {
     
     func didSayCorrectKeyword(for keyword: KeyWords) {
@@ -142,15 +120,7 @@ extension HomeVC : SpeechRecognizerDelegate {
             return
         } else if keyword == .readToMe {
             playButtonTapped()
-        }
-//        else if keyword == .pause {
-//            playButtonTapped()
-//        } else if keyword == .readNext {
-//            forwardButtonTapped()
-//        } else if keyword == .readPrevious{
-//            backButtonTapped()
-//        }
-        else if keyword == .openLiveDetection {
+        } else if keyword == .openLiveDetection {
             openLiveCameraView()
             return
         } else if keyword == .openImageStitching {
@@ -165,13 +135,32 @@ extension HomeVC : SpeechRecognizerDelegate {
 //MARK: - Collection view delegate
 extension HomeVC : UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if speechService.speechTexts.isEmpty {
-            collectionView.setEmptyView(title: "How it works?", message: K.emptyCollectionViewText)
-            return 0
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return speechService.speechTexts.isEmpty ? 1 : 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let section = indexPath.section
+        let item = indexPath.item
+        if section == 0 {
+            if item == 0 {
+                openLiveCameraView()
+            } else if item == 1 {
+                openImageStitcherView()
+            } else if item == 2 {
+                openCamera()
+            }
         }
-        collectionView.restore()
-        return speechService.speechTexts.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if section == 0 {
+            collectionView.setEmptyView(title: "Welcome to AudioVison! An auxiliary for sight.", message: K.emptyCollectionViewText)
+            return 3
+        } else {
+            collectionView.restore()
+            return speechService.speechTexts.count
+        }
     }
     
     func setupCollectionView(){
@@ -183,6 +172,8 @@ extension HomeVC : UICollectionViewDelegateFlowLayout, UICollectionViewDataSourc
         collectionView.dataSource = self
         view.addSubview(collectionView)
         collectionView.register(PageCell.self, forCellWithReuseIdentifier: PageCell.identifier)
+        collectionView.register(HomeCategoryCell.self, forCellWithReuseIdentifier: HomeCategoryCell.idenitifier)
+        collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
         
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture(_:)))
         collectionView.addGestureRecognizer(gesture)
@@ -220,10 +211,18 @@ extension HomeVC : UICollectionViewDelegateFlowLayout, UICollectionViewDataSourc
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let item = indexPath.item
-        guard let pageCell = collectionView.dequeueReusableCell(withReuseIdentifier: PageCell.identifier, for: indexPath) as? PageCell else {return UICollectionViewCell()}
-        pageCell.backgroundColor = .clear
-        pageCell.configure(speechService, at: indexPath, visionImages[item])
-        return pageCell
+        let section = indexPath.section
+        if section == 1 {
+            guard let pageCell = collectionView.dequeueReusableCell(withReuseIdentifier: PageCell.identifier, for: indexPath) as? PageCell else {return UICollectionViewCell()}
+            pageCell.backgroundColor = .clear
+            pageCell.configure(speechService, at: indexPath, visionImages[item])
+            return pageCell
+        } else {
+            guard let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeCategoryCell.idenitifier, for: indexPath) as? HomeCategoryCell else {return UICollectionViewCell()}
+            categoryCell.configure(for: indexPath)
+            return categoryCell
+        }
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
@@ -252,24 +251,52 @@ extension HomeVC : UICollectionViewDelegateFlowLayout, UICollectionViewDataSourc
             
             item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 7, bottom: 5, trailing: 7)
             
-            let groupHeight = NSCollectionLayoutDimension.absolute(300)
-            var groupWidth = NSCollectionLayoutDimension.fractionalWidth(1)
+            let groupHeight = sectionIndex == 0 ? NSCollectionLayoutDimension.absolute(120) : NSCollectionLayoutDimension.absolute(300)
+            let groupWidth = NSCollectionLayoutDimension.fractionalWidth(1)
             
             if self.collectionView.frame.size.width > 500 || self.collectionView.frame.size.height > 1000{
                 columns = 2
-                if sectionIndex == 4 {
-                    groupWidth = NSCollectionLayoutDimension.absolute(600)
-                }
             }
             
             let groupSize = NSCollectionLayoutSize(widthDimension: groupWidth,
                                                    heightDimension: groupHeight)
+            if sectionIndex == 0 {
+                columns = 3
+            }
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: columns)
             
             let section = NSCollectionLayoutSection(group: group)
+            if sectionIndex == 0 {
+                let layoutSectionHeader = self.createSectionHeader(with: sectionIndex)
+                section.boundarySupplementaryItems = [layoutSectionHeader]
+            }
             section.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: 8, bottom: 5, trailing: 8)
             return section
         }
         return layout
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        switch kind {
+        
+        case UICollectionView.elementKindSectionHeader:
+            if indexPath.section == 0 {
+                guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.identifier, for: indexPath) as? HeaderView else {return UICollectionReusableView()}
+                headerView.configure(with: "Text Detections")
+                return headerView
+            }
+            
+        default:
+            assert(false, "Unexpected element kind")
+        }
+        return UICollectionReusableView()
+    }
+    
+    private func createSectionHeader(with section: Int) -> NSCollectionLayoutBoundarySupplementaryItem {
+        let layoutSectionHeaderSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(25))
+
+        let layoutSectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: layoutSectionHeaderSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+        return layoutSectionHeader
     }
 }

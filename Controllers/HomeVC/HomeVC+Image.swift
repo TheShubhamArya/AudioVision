@@ -23,14 +23,12 @@ extension HomeVC : CapturedImageProtocol {
     func didReturnCapturedImages(with images: [UIImage]) {
         if !images.isEmpty {
             collectionView.restore()
+            activityIndicator.startAnimating()
         }
-        activityIndicator.startAnimating()
-        for (i,image) in images.enumerated() {
+        for image in images {
             let fixedImage = image.fixOrientation
             visionImages.append(fixedImage)
-            print("images ",i)
             DispatchQueue.global(qos: .userInitiated).async {
-                print("background thread")
                 self.textDetector.recognizeTextFromCamera(with: fixedImage) { text in
                     let correctedtText = self.languageProcessor.getCorrectedText(for: text)
                     self.speechService.speechTexts.append(correctedtText)
@@ -42,22 +40,12 @@ extension HomeVC : CapturedImageProtocol {
                 }
 
                 DispatchQueue.main.async {
-                    print("This is run on the main queue, after the previous code in outer block")
                     self.collectionView.reloadData()
                     self.addControlView()
                     self.activityIndicator.stopAnimating()
                 }
             }
-            
-//            recognizeText(with: fixedImage)
         }
-//        self.activityIndicator.stopAnimating()
-//        DispatchQueue.main.async { [weak self] in
-//            self?.collectionView.reloadData()
-//            self?.addControlView()
-//            self?.activityIndicator.stopAnimating()
-//        }
-//        activityIndicator.stopAnimating()
     }
     
 }

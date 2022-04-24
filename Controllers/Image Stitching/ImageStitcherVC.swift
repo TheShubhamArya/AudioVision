@@ -22,7 +22,6 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
     var didStartSpeaking = false
     var isPaused = false
     
-    private var registrationMechanism = ImageStitcher.Mechanism.homographic
     let textDetection = TextDetector()
     let languageProcessor = LanguageProcessor()
     let speechRecognizer = SpeechRecognizer()
@@ -73,7 +72,7 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
     
     var circularProgressAnimation : CABasicAnimation!
     var circularProgressBarView: CircularProgressBarView!
-    var circularViewDuration: TimeInterval = 5
+    var circularViewDuration: TimeInterval = 4
     var frameCounter = 0
     var capturedFrames = [CIImage]()
     let instructionView = InstructionView()
@@ -98,11 +97,19 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
         
         speechRecognizer.speechRecognizerDelegate = self
         speechRecognizer.speechRecognitionAuthorization()
+        
+        let _ = Timer.scheduledTimer(timeInterval: 59, target: self, selector: #selector(restartSpeechRecognition), userInfo: nil, repeats: true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         stop()
+        speechRecognizer.stopRecognizingSpeech()
+    }
+    
+    @objc func restartSpeechRecognition() {
+        speechRecognizer.stopRecognizingSpeech()
+        speechRecognizer.recognizeSpeech()
     }
     
     func setupSpeechButton() {
@@ -121,14 +128,6 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
         ])
     }
     
-    func layoutStackView() {
-        UIView.transition(with: circularProgressBarView, duration: 3.0,
-                          options: [.curveEaseOut],
-                          animations: {
-            self.circularProgressBarView.alpha = 0
-        })
-    }
-    
     
     @objc func helpButtonTapped() {
         let vc = ImageStitcherHelpView()
@@ -144,14 +143,13 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
     
     func playButtonAction() {
         if isPaused {
-            UIView.transition(with: tintView, duration: 2, options: [.curveEaseOut]) {
+            UIView.transition(with: tintView, duration: 0.5, options: [.curveEaseOut]) {
                 self.tintView.alpha = 0
-            } completion: { bool in
                 self.circularProgressBarView.alpha = 1
-                self.resume()
+            } completion: { bool in
                 self.frameCounter = 0
                 self.capturedFrames = []
-                let _ = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.startProgressAnimation), userInfo: nil, repeats: false)
+                let _ = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.startProgressAnimation), userInfo: nil, repeats: false)
             }
             
         } else  {
@@ -203,13 +201,11 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
     }
     
     func updateUIWhenCaptureEnds() {
-        layoutStackView()
         isPaused = false
         updatePlayButtonImage()
         if capturedFrames.count == 1 {
             let uiimage = UIImage(ciImage: capturedFrames.first!)
             requestToDetectText(with: uiimage)
-            
         } else if !capturedFrames.isEmpty {
             activityIndicator.startAnimating()
             stitchImages(count: 1)
@@ -217,6 +213,7 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
         
         UIView.transition(with: tintView, duration: 2, options: [.curveEaseOut]) {
             self.tintView.alpha = 0.85
+            self.circularProgressBarView.alpha = 0
         } completion: { bool in
             
         }
@@ -228,8 +225,7 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
             return
         }
         
-        print("currently on image ", count)
-        ImageStitcher.shared.register(ciFloatingImage: capturedFrames[count], ciReferenceImage: capturedFrames[count - 1], registrationMechanism: registrationMechanism) { composite, error  in
+        ImageStitcher.shared.sew(with: capturedFrames[count],and: capturedFrames[count - 1]) { composite, error  in
             if error != nil {
                 self.capturedFrames[count] = CIImage(image: self.alignedImage) ?? self.capturedFrames[count]
                 self.stitchImages(count: count + 1)
@@ -245,7 +241,6 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         if isPaused {
             if frameCounter % 10 == 0 {
-                print("frame counter is \(frameCounter)")
                 if let pixelBuffer : CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
                     let ciimage = CIImage(cvPixelBuffer: pixelBuffer)
                     
@@ -260,7 +255,6 @@ class ImageStitcherVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDel
         textDetection.recognizeText(with: image) { text in
             
             let correctedText = self.languageProcessor.getCorrectedText(for: text)
-            
             
             let emojiStr = self.languageProcessor.getEmojiSentiment(with: text)
             let emojiImage = emojiStr.toImage() ?? "⚠️".toImage()

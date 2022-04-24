@@ -21,6 +21,7 @@ class ViewModel: NSObject, ObservableObject {
         super.init()
         speechRecognizer.speechRecognizerDelegate = self
         speechRecognizer.recognizeSpeech()
+        speechSynthesizer.synthesizer.delegate = self
     }
     
     func startSpeaking(with text: String) {
@@ -44,26 +45,29 @@ class ViewModel: NSObject, ObservableObject {
     
     func dismissAction() {
         DispatchQueue.main.async {
-            UIApplication.topViewController()?.dismiss(animated: true)
+            UIApplication.kTopViewController()?.dismiss(animated: true)
         }
         
     }
 }
 
+extension ViewModel : AVSpeechSynthesizerDelegate  {
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        print("khatam ho gaya bro")
+        speechSynthesizer.stopSpeaking()
+        didStartSpeaking = false
+    }
+    
+}
+
 extension ViewModel : SpeechRecognizerDelegate {
     func didSayCorrectKeyword(for keyword: KeyWords) {
         speechRecognizer.stopRecognizingSpeech()
-        if keyword == .read {
+        if keyword == .readToMe {
             didStartSpeaking = false
             isSpeaking = false
             startSpeaking(with: text)
-        } else if keyword == .pause {
-            isSpeaking  = true
-            startSpeaking(with: text)
-        } else if keyword == .continu {
-            isSpeaking = false
-            startSpeaking(with: text)
-        } else if keyword == .dismiss {
+        } else if keyword == .done {
             dismissAction()
         }
         speechRecognizer.recognizeSpeech()

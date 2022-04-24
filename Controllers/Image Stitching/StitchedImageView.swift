@@ -15,7 +15,6 @@ struct StitchedImageView: View {
     @State var isSpeaking = false
     
     init(stitchedImage: UIImage, detectText: String, emojiImage: UIImage) {
-        print("In stitch image view init")
         self.stitchedImage = stitchedImage
         self.detectedText =   detectText
         self.emojiImage = emojiImage
@@ -36,6 +35,7 @@ struct StitchedImageView: View {
                             Text(detectedText.isEmpty ? "Nothing detected from image" : detectedText)
                                 .font(.headline)
                                 .fontWeight(.medium)
+                                .padding()
                         }
                     }
                     .padding()
@@ -48,9 +48,8 @@ struct StitchedImageView: View {
                         .frame(width: 50, height: 50)
                     Button {
                         viewModel.text = detectedText
-//                        viewModel.startSpeaking(with: detectedText)
                         isSpeaking = !isSpeaking
-                        viewModel.startSpeaking(with: "I need some long  text to test out this feature hehehehe")
+                        viewModel.startSpeaking(with: detectedText)
                     } label: {
                         Image(systemName: isSpeaking ? "speaker.slash.fill" : "speaker.wave.2.fill")
                             .foregroundColor(.blue)
@@ -74,7 +73,7 @@ struct StitchedImageView: View {
             }
         }.navigationViewStyle(.stack)
             .onAppear() {
-                viewModel.text = "I need some long  text to test out this feature hehehehe I need some long  text to test out this feature hehehehe   I need some long  text to test out this feature hehehehe   I need some long  text to test out this feature hehehehe I need some long  text to test out this feature hehehehe I need some long  text to test out this feature heheheheI need some long  text to test out this feature hehehehe"//detectedText
+                viewModel.text = detectedText
             }
         
     }

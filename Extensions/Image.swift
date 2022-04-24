@@ -31,21 +31,25 @@ extension UIImage {
         }
         switch imageOrientation {
         case .right:
-            print("right")
             rotatedImage = UIImage(cgImage: cgImage, scale: scale, orientation: .down)
         case .down:
-            print("down")
             rotatedImage = UIImage(cgImage: cgImage, scale: scale, orientation: .left)
         case .left:
-            print("left")
             rotatedImage = UIImage(cgImage: cgImage, scale: scale, orientation: .up)
         default:
-            print("up")
             rotatedImage = UIImage(cgImage: cgImage, scale: scale, orientation: .right)
         }
-        
         return rotatedImage
     }
+    
+    func resizeImage(targetSize: CGSize) -> UIImage {
+        let rect = CGRect(x: 0, y: 0, width: targetSize.width, height: targetSize.height)
+       UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
+       self.draw(in: rect)
+       let newImage = UIGraphicsGetImageFromCurrentImageContext()
+       UIGraphicsEndImageContext()
+       return newImage!
+   }
     
 }
 

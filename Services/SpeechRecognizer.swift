@@ -21,7 +21,6 @@ class SpeechRecognizer {
     var node : AVAudioInputNode?
 
     func recognizeSpeech() {
-//        print("recognize speech function")
         request = SFSpeechAudioBufferRecognitionRequest()
         node = audioEngine.inputNode
         let recordingFormat = node?.outputFormat(forBus: 0)
@@ -75,40 +74,19 @@ class SpeechRecognizer {
         let openCamera = speech.contains(KeyWords.openCamera.rawValue)
         let takePicture = speech.contains(KeyWords.takePicture.rawValue)
         let readToMe = speech.contains(KeyWords.readToMe.rawValue)
-        let play = speech.contains(KeyWords.play.rawValue)
-        let pause = speech.contains(KeyWords.pause.rawValue)
-        let openPhotoLibrary = speech.contains(KeyWords.openPhotoLibrary.rawValue)
-        let readFromFiles = speech.contains(KeyWords.readFromFiles.rawValue)
-        let readNext = speech.contains(KeyWords.readNext.rawValue)
-        let readPrevious = speech.contains(KeyWords.readPrevious.rawValue)
         let done = speech.contains(KeyWords.done.rawValue)
         let openLiveDetection = speech.contains(KeyWords.openLiveDetection.rawValue)
         let start = speech.contains(KeyWords.start.rawValue)
         let stop =  speech.contains(KeyWords.stop.rawValue)
-        let read = speech.contains(KeyWords.read.rawValue)
-        let continu = speech.contains(KeyWords.continu.rawValue)
         let quitLiveDetection = speech.contains(KeyWords.quitLiveDetection.rawValue)
         let openImageStitching = speech.contains(KeyWords.openImageStitching.rawValue)
         let quitImageStitching = speech.contains(KeyWords.quitImageStitching.rawValue)
-        let dismiss = speech.contains(KeyWords.dismiss.rawValue)
         if openCamera {
             return (true, .openCamera)
         } else if takePicture {
             return (true, .takePicture)
         } else if readToMe {
             return (true, .readToMe)
-        } else if play {
-            return (true, .play)
-        } else if pause {
-            return (true, .pause)
-        } else if openPhotoLibrary {
-            return (true, .openPhotoLibrary)
-        } else if readFromFiles {
-            return (true, .readFromFiles)
-        } else if readNext {
-            return (true, .readNext)
-        } else if readPrevious {
-            return (true, .readPrevious)
         } else if done {
             return (true, .done)
         } else if openLiveDetection {
@@ -117,18 +95,12 @@ class SpeechRecognizer {
             return (true, .start)
         } else if stop {
             return (true, .stop)
-        } else if read {
-            return (true, .read)
-        } else if continu {
-            return (true, .continu)
         } else if quitLiveDetection {
             return (true, .quitLiveDetection)
         } else if openImageStitching {
             return (true, .openImageStitching)
-        }  else if dismiss  {
-            return (true, .dismiss)
         } else  if  quitImageStitching {
-            return  (true, .quitImageStitching)
+            return (true, .quitImageStitching)
         }
         return (false, .none)
     }

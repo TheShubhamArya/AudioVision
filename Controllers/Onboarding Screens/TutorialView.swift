@@ -30,7 +30,7 @@ struct TutorialView: View {
             } else if didTapNext == 5 {
                 CommandCell(image: "chevron.backward.circle.fill",headline: "\"Done\"",subtitle: "This will remove the camera view from the screen and process the pictures for text.", prevValue: prevValue, didTapNext: didTapNext)
             } else if didTapNext == 6 {
-                CommandCell(image: "speaker.wave.2.fill",headline: "\"Read\"",subtitle: "This commands reads the processed text to you on your speaker. Make sure to have volume up.", prevValue: prevValue, didTapNext: didTapNext)
+                CommandCell(image: "speaker.wave.2.fill",headline: "\"Read to me\"",subtitle: "This commands reads the processed text to you on your speaker. Make sure to have volume up.", prevValue: prevValue, didTapNext: didTapNext)
             } else if didTapNext == 7 {
                 CommandCell(image: "photo.fill",headline: "\"Take Picture\"",subtitle: "This command opens the photo library for you to select image from your photo library.", prevValue: prevValue, didTapNext: didTapNext)
             } else if didTapNext == 8 {

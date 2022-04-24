@@ -27,7 +27,7 @@ class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelega
     private let textView : UITextView = {
         let textView = UITextView()
         textView.isEditable = false
-        textView.textColor = .label
+        textView.textColor = .white
         textView.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textView.backgroundColor = .clear
         return textView
@@ -99,11 +99,18 @@ class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelega
         
         speechRecognizer.speechRecognizerDelegate = self
         speechRecognizer.speechRecognitionAuthorization()
+        let _ = Timer.scheduledTimer(timeInterval: 59, target: self, selector: #selector(restartSpeechRecognition), userInfo: nil, repeats: true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         stop()
+        speechRecognizer.stopRecognizingSpeech()
+    }
+    
+    @objc func restartSpeechRecognition() {
+        speechRecognizer.stopRecognizingSpeech()
+        speechRecognizer.recognizeSpeech()
     }
     
     func setupSpeechButton() {
@@ -163,8 +170,8 @@ class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelega
             speechService.stopSpeaking()
         } else {
             captureFrame = false
-            UIView.transition(with: circularProgressBarView, duration: 0.33,
-                              options: [.curveEaseOut, .transitionFlipFromBottom],
+            UIView.transition(with: circularProgressBarView, duration: 0.5,
+                              options: [.curveEaseOut],
                               animations: {
                 self.circularProgressBarView.alpha = 0
                 self.setupSpeechButton()
@@ -206,7 +213,6 @@ class LiveCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelega
             if self?.pauseButtonState ?? true {
                 self?.captureFrame = true
             }
-           
             self?.progressAnimation(duration: self!.circularViewDuration)
         }
         circularProgressBarView.progressLayer.add(circularProgressAnimation, forKey: "progressAnim")
@@ -272,12 +278,12 @@ extension LiveCameraVC : AVSpeechSynthesizerDelegate {
         mutableAttributedString.addAttributes([.backgroundColor: UIColor.systemYellow, .font: UIFont.systemFont(ofSize: 17, weight: .regular)], range: characterRange)
         textView.attributedText = mutableAttributedString
         textView.font = UIFont.systemFont(ofSize: 17, weight: .regular)
-        textView.textColor = .label
+        textView.textColor = .white
     }
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         textView.attributedText = NSAttributedString(string: utterance.speechString)
-        textView.textColor = .label
+        textView.textColor = .white
         textView.font = UIFont.systemFont(ofSize: 17, weight: .regular)
     }
 }
@@ -292,18 +298,9 @@ extension LiveCameraVC : SpeechRecognizerDelegate {
             pauseButtonState = false
             liveButtonAction()
             
-        } else if keyword == .read {
+        } else if keyword == .readToMe {
             speechService.stopSpeaking()
             didStartSpeaking = false
-            isSpeaking = true
-            speechActions()
-            
-        }
-        else if keyword == .pause {
-            isSpeaking = false
-            speechActions()
-            
-        } else if keyword == .continu {
             isSpeaking = true
             speechActions()
             

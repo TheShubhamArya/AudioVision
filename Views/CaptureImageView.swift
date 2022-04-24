@@ -16,7 +16,6 @@ class CaptureImageView: UIView {
         }
     }
     
-    //MARK:- View Components
     let imageView : UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -27,7 +26,6 @@ class CaptureImageView: UIView {
         return imageView
     }()
     
-    //MARK:- Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupView()
@@ -38,8 +36,7 @@ class CaptureImageView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK:- Setup
-    func setupView(){
+    private func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = .white
         layer.cornerRadius = 10

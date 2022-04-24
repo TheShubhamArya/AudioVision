@@ -68,9 +68,9 @@ extension HomeVC {
         view.addSubview(controlView)
         controlView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            controlView.leadingAnchor.constraint(equalTo: collectionView.leadingAnchor, constant: 20),
-            controlView.trailingAnchor.constraint(equalTo: collectionView.trailingAnchor, constant: -20),
             controlView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            controlView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.3),
+            controlView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             controlView.heightAnchor.constraint(equalToConstant: 80)
         ])
         

@@ -56,13 +56,8 @@ class CaptureImageVC: UIViewController {
     let capturedImageView2 = CaptureImageView()
     let capturedImageView3 = CaptureImageView()
     
-    deinit {
-        print("capture image VC deinit")
-    }
-    
     let speechRecognizer = SpeechRecognizer()
     
-    //MARK:- Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -207,8 +202,6 @@ class CaptureImageVC: UIViewController {
         capturedImageView1.alpha = 0
         capturedImageView2.alpha = 0
         capturedImageView3.alpha = 0
-        
-        print("image count  is ", imageCount)
         
         if capturedImages.count >= 1 {
             capturedImageView1.alpha = 1

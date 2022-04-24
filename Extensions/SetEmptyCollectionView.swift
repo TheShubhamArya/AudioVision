@@ -41,22 +41,13 @@ extension UICollectionView {
         stackView.addArrangedSubview(messageLabel)
         
         emptyView.addSubview(stackView)
-//        emptyView.addSubview(titleLabel)
-//        emptyView.addSubview(messageLabel)
+        
         stackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             stackView.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor),
             stackView.leadingAnchor.constraint(equalTo: emptyView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: emptyView.trailingAnchor, constant: -20),
-            
-//            titleLabel.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor, constant: 0),
-//            titleLabel.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
-//            titleLabel.leadingAnchor.constraint(equalTo: emptyView.leadingAnchor, constant: 20),
-//            titleLabel.trailingAnchor.constraint(equalTo: emptyView.trailingAnchor, constant: -20),
-//            messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-//            messageLabel.leadingAnchor.constraint(equalTo: emptyView.leadingAnchor, constant: 20),
-//            messageLabel.trailingAnchor.constraint(equalTo: emptyView.trailingAnchor, constant: -20)
         ])
         self.backgroundView = emptyView
     }

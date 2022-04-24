@@ -13,6 +13,13 @@ struct LiveCameraHelpView: View {
     var body: some View {
         NavigationView{
             VStack {
+                
+                Text("Place camera close to text. Hold steady and keep the camera in **landscape** with camera on the top corner.")
+                    .padding()
+                    .multilineTextAlignment(.center)
+                
+                
+                
                 Text("Here are some commands that are supported for the live text detection")
                     .padding()
                 
@@ -22,7 +29,7 @@ struct LiveCameraHelpView: View {
                 } else if didTapNext == 1 {
                     CommandCell(image: "pause",headline: "\"Stop\"",subtitle: "This command stops live text detection from your camera so you can focus on the text detected.",prevValue: prevValue, didTapNext: didTapNext)
                 } else if didTapNext == 2 {
-                    CommandCell(image: "speaker.wave.2.fill",headline: "\"Read\"",subtitle: "This reads the text detected by you. This command can be used only after you STOP live detection. This command reads text from the starting", prevValue: prevValue, didTapNext: didTapNext)
+                    CommandCell(image: "speaker.wave.2.fill",headline: "\"Read to me\"",subtitle: "This reads the text detected by you. This command can be used only after you STOP live detection. This command reads text from the starting", prevValue: prevValue, didTapNext: didTapNext)
                 } else if didTapNext == 3 {
                     CommandCell(image: "chevron.left.circle.fill",headline: "\"Quit Live Detection\"",subtitle: "This command quits live detection and takes you to the home screen", prevValue: prevValue, didTapNext: didTapNext)
                     
