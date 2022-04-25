@@ -1,6 +1,6 @@
 # AudioVision
 
-This is an iOS aapplication that aims to help blind people see the text around them. This is made possible with the help of 
+This is an iOS application that aims to help blind people see the text around them. This is made possible with the help of 
 1. Speech recognition - to take users' commands and turn them into actions in the app
 2. Text Detection -  to detect text out of an image
 3. Image Stitching - to stitch multiple images together to create 1 long image which can be used to detect the text
