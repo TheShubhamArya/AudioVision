@@ -1,6 +1,5 @@
 # AudioVision
-
-[Slides](https://docs.google.com/presentation/d/1-80cJeavF_jXC6et4aiFahGEHKMqDR9Fvft6a0orQWU/edit?usp=sharing
+[Slides](https://docs.google.com/presentation/d/1-80cJeavF_jXC6et4aiFahGEHKMqDR9Fvft6a0orQWU/edit?usp=sharing)
 
 This is an iOS application that aims to help blind people see the text around them. This is made possible with the help of 
 1. Speech recognition - to take users' commands and turn them into actions in the app
